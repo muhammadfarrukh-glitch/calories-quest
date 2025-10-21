@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pymongo.mongo_client import MongoClient
-from backend.lib.database import get_db
-from backend.lib.models.user import User
-from backend.routers.auth import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
+from ..lib.database import get_db
+from ..lib.models.user import User
+from .auth import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 import bcrypt
 from datetime import datetime, timedelta
 import json

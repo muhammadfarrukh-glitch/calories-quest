@@ -8,7 +8,7 @@ from fastapi.responses import UJSONResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 
-from routers import users, auth
+from backend.routers import users, auth
 
 load_dotenv()
 

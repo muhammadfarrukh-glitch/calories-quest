@@ -11,7 +11,7 @@ const api = async (url: string, options: RequestInit = {}) => {
     headers['x-auth-token'] = token;
   }
 
-  const fullUrl = `http://127.0.0.1:8000${url}`;
+  const fullUrl = `${import.meta.env.VITE_API_BASE_URL}${url}`;
   console.log('Fetching URL:', fullUrl);
   const response = await fetch(fullUrl, {
     ...options,

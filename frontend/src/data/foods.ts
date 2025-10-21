@@ -1,0 +1,17 @@
+export const mockFoodDatabase = [
+  { name: "Apple", calories: 95, defaultQuantity: "1 medium" },
+  { name: "Banana", calories: 105, defaultQuantity: "1 medium" },
+  { name: "Chicken Breast (Cooked)", calories: 165, defaultQuantity: "100g" },
+  { name: "Brown Rice (Cooked)", calories: 130, defaultQuantity: "1 cup" },
+  { name: "Broccoli (Steamed)", calories: 55, defaultQuantity: "1 cup" },
+  { name: "Salmon (Cooked)", calories: 206, defaultQuantity: "100g" },
+  { name: "Almonds", calories: 164, defaultQuantity: "1/4 cup" },
+  { name: "Egg (Large, Boiled)", calories: 78, defaultQuantity: "1 large" },
+  { name: "Greek Yogurt (Plain)", calories: 100, defaultQuantity: "1 cup" },
+  { name: "Oats (Dry)", calories: 150, defaultQuantity: "1/2 cup" },
+  { name: "Whole Wheat Bread", calories: 81, defaultQuantity: "1 slice" },
+  { name: "Peanut Butter", calories: 190, defaultQuantity: "2 tbsp" },
+  { name: "Avocado", calories: 234, defaultQuantity: "1 medium" },
+  { name: "Sweet Potato (Baked)", calories: 180, defaultQuantity: "1 medium" },
+  { name: "Quinoa (Cooked)", calories: 222, defaultQuantity: "1 cup" },
+];

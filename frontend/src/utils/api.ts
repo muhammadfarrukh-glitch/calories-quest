@@ -2,10 +2,16 @@ import { getToken } from './auth';
 
 const api = async (url: string, options: RequestInit = {}) => {
   const token = getToken();
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
+  const headers = { ...options.headers };
+
+  if (options.body && typeof options.body === 'string') {
+    try {
+      JSON.parse(options.body);
+      headers['Content-Type'] = 'application/json';
+    } catch (e) {
+      // Not a JSON string, do not set Content-Type
+    }
+  }
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;

@@ -10,11 +10,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { FoodEntry } from '@/types';
 import { mockFoodDatabase } from '@/data/foods';
 import { ScrollArea } from './ui/scroll-area';
+import { X, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface AddFoodDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddFood: (entry: Omit<FoodEntry, 'id' | 'timestamp'>) => void;
+  onAddFood: (entry: Omit<FoodEntry, 'id' | 'timestamp'>) => Promise<void>;
 }
 
 const manualFormSchema = z.object({
@@ -25,17 +27,23 @@ const manualFormSchema = z.object({
 
 export const AddFoodDialog = ({ isOpen, onClose, onAddFood }: AddFoodDialogProps) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const manualForm = useForm<z.infer<typeof manualFormSchema>>({
     resolver: zodResolver(manualFormSchema),
   });
 
-  const handleAddFood = (food: Omit<FoodEntry, 'id' | 'timestamp'>) => {
-    onAddFood(food);
-    onClose();
+  const handleAddFood = async (food: Omit<FoodEntry, 'id' | 'timestamp'>) => {
+    setIsLoading(true);
+    try {
+      await onAddFood(food);
+      onClose();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const onManualSubmit = (values: z.infer<typeof manualFormSchema>) => {
-    handleAddFood(values);
+    handleAddFood(values as Omit<FoodEntry, 'id' | 'timestamp'>);
     manualForm.reset();
   };
 
@@ -49,6 +57,15 @@ export const AddFoodDialog = ({ isOpen, onClose, onAddFood }: AddFoodDialogProps
         <DialogHeader>
           <DialogTitle>Add Food to Your Log</DialogTitle>
         </DialogHeader>
+        <DialogClose asChild>
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </button>
+        </DialogClose>
         <Tabs defaultValue="search">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="search">Search</TabsTrigger>
@@ -69,8 +86,13 @@ export const AddFoodDialog = ({ isOpen, onClose, onAddFood }: AddFoodDialogProps
                         <p className="font-medium">{food.name}</p>
                         <p className="text-sm text-gray-500">{food.calories} kcal / {food.defaultQuantity}</p>
                       </div>
-                      <Button size="sm" onClick={() => handleAddFood({ name: food.name, calories: food.calories, quantity: food.defaultQuantity })}>
-                        Add
+                      <Button
+                        size="sm"
+                        onClick={() => handleAddFood({ name: food.name, calories: food.calories, quantity: food.defaultQuantity })}
+                        disabled={isLoading}
+                        className={cn(isLoading ? "px-3" : "")}
+                      >
+                        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
                       </Button>
                     </div>
                   ))}
@@ -103,7 +125,10 @@ export const AddFoodDialog = ({ isOpen, onClose, onAddFood }: AddFoodDialogProps
                   </FormItem>
                 )} />
                 <DialogFooter>
-                  <Button type="submit">Add Manually</Button>
+                  <Button type="submit" disabled={isLoading}>
+                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    {isLoading ? "Adding..." : "Add Manually"}
+                  </Button>
                 </DialogFooter>
               </form>
             </Form>

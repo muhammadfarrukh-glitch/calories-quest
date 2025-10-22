@@ -41,7 +41,7 @@ const Index = () => {
     }
   };
 
-  const addFoodEntry = (entry: Omit<FoodEntry, 'id' | 'timestamp'>) => {
+  const addFoodEntry = async (entry: Omit<FoodEntry, 'id' | 'timestamp'>): Promise<void> => {
     const newEntry: FoodEntry = {
       ...entry,
       id: crypto.randomUUID(),

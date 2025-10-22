@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
-import { LogOut, User, Apple } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
@@ -26,9 +26,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             🔥 CalorieQuest
           </h1>
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/food-log')}>
-              <Apple className="h-5 w-5" />
-            </Button>
             <Button variant="ghost" size="icon" onClick={() => navigate('/profile')}>
               <User className="h-5 w-5" />
             </Button>

@@ -2,12 +2,21 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pymongo.mongo_client import MongoClient
 from ..lib.database import get_db
+from pydantic import BaseModel
 from ..lib.models.user import User
-from .auth import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
+from .auth import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_user
 import bcrypt
 from datetime import datetime, timedelta
 import json
 from bson import ObjectId
+
+class UserProfile(BaseModel):
+    age: int
+    gender: str
+    height: float
+    weight: float
+    activityLevel: str
+    goal: str
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -63,3 +72,27 @@ async def get_all_users(db: MongoClient = Depends(get_db)):
     for user in users_collection.find({}, {"password": 0}):
         users.append(user)
     return json.loads(JSONEncoder().encode(users))
+
+@router.get("/profile")
+async def get_user_profile(current_user: User = Depends(get_current_user), db: MongoClient = Depends(get_db)):
+    users_collection = db.get_collection("users")
+    user_profile = users_collection.find_one({"email": current_user.email}, {"password": 0})
+    if not user_profile:
+        raise HTTPException(status_code=404, detail="User profile not found")
+    return json.loads(JSONEncoder().encode(user_profile))
+
+@router.put("/profile")
+async def update_user_profile(profile_data: UserProfile, current_user: User = Depends(get_current_user), db: MongoClient = Depends(get_db)):
+    users_collection = db.get_collection("users")
+    
+    update_data = profile_data.dict()
+    
+    result = users_collection.update_one(
+        {"email": current_user.email},
+        {"$set": update_data}
+    )
+    
+    if result.modified_count == 1:
+        return {"message": "Profile updated successfully"}
+    
+    raise HTTPException(status_code=404, detail="User profile not found or no changes made")

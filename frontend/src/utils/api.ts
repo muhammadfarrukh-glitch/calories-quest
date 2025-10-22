@@ -17,6 +17,9 @@ const api = async (url: string, options: RequestInit = {}) => {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  console.log('Token:', token);
+  console.log('Headers:', headers);
+
   const fullUrl = `${import.meta.env.VITE_API_BASE_URL}${url}`;
   console.log('Fetching URL:', fullUrl);
   const response = await fetch(fullUrl, {

@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 # Add the project root to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from backend.routers import users, auth
+from backend.routers import users, auth, food
 
 load_dotenv()
 
@@ -39,6 +39,7 @@ async def health_check():
 
 app.include_router(users.router, prefix="/api/users", tags=["users"])
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(food.router, prefix="/api/food", tags=["food"])
 
 if __name__ == "__main__":
     import uvicorn

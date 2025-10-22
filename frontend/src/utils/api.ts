@@ -8,7 +8,7 @@ const api = async (url: string, options: RequestInit = {}) => {
   };
 
   if (token) {
-    headers['x-auth-token'] = token;
+    headers['Authorization'] = `Bearer ${token}`;
   }
 
   const fullUrl = `${import.meta.env.VITE_API_BASE_URL}${url}`;

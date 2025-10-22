@@ -35,7 +35,7 @@ const Register = () => {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: formData,
+        body: formData.toString(),
       });
 
       if (response.ok) {

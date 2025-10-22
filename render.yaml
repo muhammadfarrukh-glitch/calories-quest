@@ -3,5 +3,5 @@ services:
     name: calories-quest-backend
     env: python
     rootDir: backend
-    startCommand: "PYTHONPATH=. uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
+    startCommand: "uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
     buildCommand: "pip install -r backend/requirements.txt"

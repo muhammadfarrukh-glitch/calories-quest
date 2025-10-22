@@ -20,7 +20,7 @@ app.add_middleware(
     allow_origins=["https://calories-quest.onrender.com", "http://localhost:5137"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*", "Authorization"],
+    allow_headers=["*"],
 )
 
 MONGO_DETAILS = os.getenv("MONGO_DETAILS")

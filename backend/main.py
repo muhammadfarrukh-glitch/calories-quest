@@ -17,10 +17,10 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://calories-quest.onrender.com", "http://localhost:5137"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*", "Authorization"],
 )
 
 MONGO_DETAILS = os.getenv("MONGO_DETAILS")

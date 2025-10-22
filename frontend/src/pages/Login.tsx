@@ -30,7 +30,7 @@ const Login = () => {
       formData.append('username', values.email);
       formData.append('password', values.password);
 
-      const response = await fetch('http://127.0.0.1:8000/api/auth/login', {
+      const response = await api('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

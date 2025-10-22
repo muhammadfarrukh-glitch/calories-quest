@@ -30,7 +30,7 @@ const Register = () => {
       formData.append('username', values.email);
       formData.append('password', values.password);
 
-      const response = await fetch('http://127.0.0.1:8000/api/users/register', {
+      const response = await api('/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -79,7 +79,7 @@ const Register = () => {
               <Button type="submit" className="w-full">Create Account</Button>
               <Button type="button" variant="outline" className="w-full" onClick={async () => {
                 try {
-                  const response = await fetch('http://127.0.0.1:8000/api/users/all');
+                  const response = await api('/api/users/all');
                   const data = await response.json();
                   alert(JSON.stringify(data, null, 2));
                 } catch (error) {

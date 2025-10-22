@@ -39,8 +39,8 @@ const Register = () => {
       });
 
       if (response.ok) {
-        const { token } = await response.json();
-        localStorage.setItem('token', token);
+        const { access_token } = await response.json();
+        localStorage.setItem('token', access_token);
         showSuccess("Registration successful! Please log in.");
         navigate('/login');
       } else {

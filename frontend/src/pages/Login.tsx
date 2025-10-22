@@ -39,8 +39,8 @@ const Login = () => {
       });
 
       if (response.ok) {
-        const { token } = await response.json();
-        localStorage.setItem('token', token);
+        const { access_token } = await response.json();
+        localStorage.setItem('token', access_token);
         localStorage.setItem('isLoggedIn', 'true');
         navigate('/');
       } else {

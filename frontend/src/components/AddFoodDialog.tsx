@@ -11,7 +11,7 @@ import { FoodEntry } from '@/types';
 import { mockFoodDatabase } from '@/data/foods';
 import { ScrollArea } from './ui/scroll-area';
 import { X, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { FoodSearchItem } from './FoodSearchItem';
 
 interface AddFoodDialogProps {
   isOpen: boolean;
@@ -89,27 +89,7 @@ export const AddFoodDialog = ({ isOpen, onClose, onAddFood }: AddFoodDialogProps
               <ScrollArea className="h-60">
                 <div className="space-y-2">
                   {filteredFoods.map(food => (
-                    <div key={food.name} className="flex items-center justify-between p-2 border rounded-md">
-                      <div>
-                        <p className="font-medium">{food.name}</p>
-                        <p className="text-sm text-gray-500">{food.calories} kcal / {food.defaultQuantity}</p>
-                      </div>
-                      <Button
-                        size="sm"
-                        onClick={() => handleAddFood({
-                          food_name: food.name,
-                          calories: food.calories,
-                          quantity: food.defaultQuantity,
-                          protein: food.protein,
-                          carbs: food.carbs,
-                          fat: food.fat,
-                        })}
-                        disabled={isLoading}
-                        className={cn(isLoading ? "px-3" : "")}
-                      >
-                        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
-                      </Button>
-                    </div>
+                    <FoodSearchItem key={food.name} food={food} onAdd={handleAddFood} />
                   ))}
                 </div>
               </ScrollArea>

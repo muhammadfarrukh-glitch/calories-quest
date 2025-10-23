@@ -27,8 +27,12 @@ const formSchema = z.object({
 
 const Profile = () => {
   const navigate = useNavigate();
-  // In a real app, you'd fetch this from the server
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: userProfile,
+  });
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -45,12 +49,7 @@ const Profile = () => {
     };
 
     fetchProfile();
-  }, []);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: userProfile,
-  });
+  }, []); // 👈 runs only once
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -61,6 +60,8 @@ const Profile = () => {
 
       if (response.ok) {
         showSuccess("Profile updated successfully!");
+        // Optional: Refetch updated profile
+        // await fetchProfile();
       } else {
         const errorData = await response.json();
         showError(errorData.msg || "Failed to update profile.");

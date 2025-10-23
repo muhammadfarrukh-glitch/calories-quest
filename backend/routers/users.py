@@ -38,7 +38,8 @@ async def signup(request: Request, form_data: OAuth2PasswordRequestForm = Depend
     if not email:
         raise HTTPException(status_code=400, detail="Email/Username is required.")
 
-    existing_user = users_collection.find_one({"email": email})
+    existing_user = await users_collection.find_one({"email": email})
+    print(f"Existing user check for {email}: {existing_user}")
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
@@ -54,7 +55,7 @@ async def signup(request: Request, form_data: OAuth2PasswordRequestForm = Depend
     }
     
     try:
-        result = users_collection.insert_one(new_user)
+        result = await users_collection.insert_one(new_user)
         print(f"SUCCESS: Inserted user with id: {result.inserted_id}")
     except Exception as e:
         print(f"DATABASE ERROR: Failed to insert user. Reason: {e}")

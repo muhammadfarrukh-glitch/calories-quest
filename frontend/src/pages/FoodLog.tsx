@@ -24,7 +24,7 @@ const FoodLog = () => {
         const response = await getFoodLog();
         if (response.ok) {
           const data = await response.json();
-          console.log('Fetched data:', data);
+         
           setFoodLog(data);
         } else {
           console.error('Failed to fetch food log');
@@ -80,7 +80,6 @@ const FoodLog = () => {
     }
   };
 
-  console.log('Food log state:', foodLog);
   return (
     <div>
       <h1>Food Log</h1>

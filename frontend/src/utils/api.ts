@@ -25,7 +25,6 @@ const api = async (url: string, options: RequestInit = {}) => {
   }
 
   const fullUrl = `${import.meta.env.VITE_API_BASE_URL}${url}`;
-  console.log('Fetching URL:', fullUrl);
   const response = await fetch(fullUrl, {
     ...options,
     headers,
@@ -38,7 +37,6 @@ export default api;
 
 export const updateUserGoals = async (goals: UserGoals) => {
   const url = '/api/users/profile/goals';
-  console.log('Attempting to update goals at:', url);
   return api(url, {
     method: 'PUT',
     body: JSON.stringify(goals),

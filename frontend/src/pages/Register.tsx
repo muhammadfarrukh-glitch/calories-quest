@@ -45,7 +45,8 @@ const Register = () => {
         navigate('/login');
       } else {
         const errorData = await response.json();
-        showError(errorData.msg || "Registration failed.");
+        showError(errorData.detail || "Registration failed.");
+        
       }
     } catch (error) {
       showError("Registration failed. Please try again.");

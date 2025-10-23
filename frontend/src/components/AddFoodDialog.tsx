@@ -20,9 +20,12 @@ interface AddFoodDialogProps {
 }
 
 const manualFormSchema = z.object({
-  name: z.string().min(1, "Food name is required"),
+  food_name: z.string().min(1, "Food name is required"),
   quantity: z.string().min(1, "Quantity is required"),
   calories: z.coerce.number().min(0, "Calories must be a positive number"),
+  protein: z.coerce.number().min(0, "Protein must be a positive number"),
+  carbs: z.coerce.number().min(0, "Carbs must be a positive number"),
+  fat: z.coerce.number().min(0, "Fat must be a positive number"),
 });
 
 export const AddFoodDialog = ({ isOpen, onClose, onAddFood }: AddFoodDialogProps) => {
@@ -30,6 +33,11 @@ export const AddFoodDialog = ({ isOpen, onClose, onAddFood }: AddFoodDialogProps
   const [isLoading, setIsLoading] = useState(false);
   const manualForm = useForm<z.infer<typeof manualFormSchema>>({
     resolver: zodResolver(manualFormSchema),
+    defaultValues: {
+      protein: 0,
+      carbs: 0,
+      fat: 0,
+    },
   });
 
   const handleAddFood = async (food: Omit<FoodEntry, 'id' | 'timestamp'>) => {
@@ -88,7 +96,14 @@ export const AddFoodDialog = ({ isOpen, onClose, onAddFood }: AddFoodDialogProps
                       </div>
                       <Button
                         size="sm"
-                        onClick={() => handleAddFood({ name: food.name, calories: food.calories, quantity: food.defaultQuantity })}
+                        onClick={() => handleAddFood({
+                          food_name: food.name,
+                          calories: food.calories,
+                          quantity: food.defaultQuantity,
+                          protein: food.protein,
+                          carbs: food.carbs,
+                          fat: food.fat,
+                        })}
                         disabled={isLoading}
                         className={cn(isLoading ? "px-3" : "")}
                       >
@@ -103,7 +118,7 @@ export const AddFoodDialog = ({ isOpen, onClose, onAddFood }: AddFoodDialogProps
           <TabsContent value="manual" className="py-4">
             <Form {...manualForm}>
               <form onSubmit={manualForm.handleSubmit(onManualSubmit)} className="space-y-4">
-                <FormField control={manualForm.control} name="name" render={({ field }) => (
+                <FormField control={manualForm.control} name="food_name" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Food Name</FormLabel>
                     <FormControl><Input placeholder="e.g., Homemade Salad" {...field} /></FormControl>
@@ -124,6 +139,29 @@ export const AddFoodDialog = ({ isOpen, onClose, onAddFood }: AddFoodDialogProps
                     <FormMessage />
                   </FormItem>
                 )} />
+                <div className="grid grid-cols-3 gap-4">
+                  <FormField control={manualForm.control} name="protein" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Protein (g)</FormLabel>
+                      <FormControl><Input type="number" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={manualForm.control} name="carbs" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Carbs (g)</FormLabel>
+                      <FormControl><Input type="number" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={manualForm.control} name="fat" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Fat (g)</FormLabel>
+                      <FormControl><Input type="number" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
                 <DialogFooter>
                   <Button type="submit" disabled={isLoading}>
                     {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}

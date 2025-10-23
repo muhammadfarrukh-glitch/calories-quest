@@ -14,6 +14,7 @@ import { UserProfile } from '@/types';
 import Layout from '@/components/Layout';
 import { showSuccess, showError } from '@/utils/toast';
 import api from '@/utils/api';
+import { GoalForm } from '@/components/GoalForm';
 
 const formSchema = z.object({
   age: z.coerce.number().min(13, "Must be at least 13 years old"),
@@ -71,87 +72,97 @@ const Profile = () => {
 
   return (
     <Layout>
-      <Card className="w-full max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-2xl">Your Profile</CardTitle>
-          <CardDescription>Update your personal information and goals here.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField control={form.control} name="age" render={({ field }) => (
+      <div className="space-y-6">
+        <Card className="w-full max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle className="text-2xl">Your Profile</CardTitle>
+            <CardDescription>Update your personal information and goals here.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField control={form.control} name="age" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Age</FormLabel>
+                      <FormControl><Input type="number" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="gender" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gender</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          <SelectItem value="male">Male</SelectItem>
+                          <SelectItem value="female">Female</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="height" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Height (cm)</FormLabel>
+                      <FormControl><Input type="number" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="weight" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Weight (kg)</FormLabel>
+                      <FormControl><Input type="number" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+                <FormField control={form.control} name="activityLevel" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Age</FormLabel>
-                    <FormControl><Input type="number" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="gender" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Gender</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel>Activity Level</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                       <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="sedentary">Sedentary</SelectItem>
+                        <SelectItem value="light">Lightly active</SelectItem>
+                        <SelectItem value="moderate">Moderately active</SelectItem>
+                        <SelectItem value="active">Very active</SelectItem>
+                        <SelectItem value="very_active">Extra active</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )} />
-                <FormField control={form.control} name="height" render={({ field }) => (
+                <FormField control={form.control} name="goal" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Height (cm)</FormLabel>
-                    <FormControl><Input type="number" {...field} /></FormControl>
+                    <FormLabel>Primary Goal</FormLabel>
+                    <FormControl>
+                      <RadioGroup onValueChange={field.onChange} value={field.value} className="flex space-x-4">
+                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="lose" /></FormControl><FormLabel className="font-normal">Lose Weight</FormLabel></FormItem>
+                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="maintain" /></FormControl><FormLabel className="font-normal">Maintain Weight</FormLabel></FormItem>
+                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="gain" /></FormControl><FormLabel className="font-normal">Gain Muscle</FormLabel></FormItem>
+                      </RadioGroup>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
-                <FormField control={form.control} name="weight" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Weight (kg)</FormLabel>
-                    <FormControl><Input type="number" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              </div>
-              <FormField control={form.control} name="activityLevel" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Activity Level</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                    <SelectContent>
-                      <SelectItem value="sedentary">Sedentary</SelectItem>
-                      <SelectItem value="light">Lightly active</SelectItem>
-                      <SelectItem value="moderate">Moderately active</SelectItem>
-                      <SelectItem value="active">Very active</SelectItem>
-                      <SelectItem value="very_active">Extra active</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              <FormField control={form.control} name="goal" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Primary Goal</FormLabel>
-                  <FormControl>
-                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4">
-                      <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="lose" /></FormControl><FormLabel className="font-normal">Lose Weight</FormLabel></FormItem>
-                      <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="maintain" /></FormControl><FormLabel className="font-normal">Maintain Weight</FormLabel></FormItem>
-                      <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="gain" /></FormControl><FormLabel className="font-normal">Gain Muscle</FormLabel></FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={() => navigate('/')}>Back to Dashboard</Button>
-                <Button type="submit">Save Changes</Button>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                <div className="flex justify-end space-x-2">
+                  <Button type="submit">Save Changes</Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+        <Card className="w-full max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle className="text-2xl">Nutritional Goals</CardTitle>
+            <CardDescription>Update your daily nutritional goals.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {userProfile && <GoalForm initialValues={userProfile} />}
+          </CardContent>
+        </Card>
+      </div>
     </Layout>
   );
 };

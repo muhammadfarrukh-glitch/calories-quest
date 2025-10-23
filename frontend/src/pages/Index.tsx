@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { PlusCircle, Trash2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AddFoodDialog } from '@/components/AddFoodDialog';
+import { getFoodLog, addFoodLog, deleteFoodLog } from '../utils/api';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -17,45 +18,54 @@ const Index = () => {
 
   useEffect(() => {
     const storedQuest = localStorage.getItem('quest');
-    // If user is logged in but hasn't finished onboarding, redirect them.
     if (!storedQuest) {
       navigate('/onboarding');
       return;
     }
     setQuest(JSON.parse(storedQuest));
-    loadFoodLogForToday();
+
+    const fetchFoodLog = async () => {
+      try {
+        const response = await getFoodLog();
+        if (response.ok) {
+          const data = await response.json();
+          setFoodLog(data);
+        } else {
+          console.error('Failed to fetch food log');
+        }
+      } catch (error) {
+        console.error('Error fetching food log:', error);
+      }
+    };
+
+    fetchFoodLog();
   }, [navigate]);
 
-  const getTodayLogKey = () => {
-    const today = new Date().toISOString().split('T')[0];
-    return `foodlog_${today}`;
-  };
-
-  const loadFoodLogForToday = () => {
-    const logKey = getTodayLogKey();
-    const storedLog = localStorage.getItem(logKey);
-    if (storedLog) {
-      setFoodLog(JSON.parse(storedLog));
-    } else {
-      setFoodLog([]);
+  const addFoodEntry = async (entry: Omit<FoodEntry, 'id' | 'timestamp'>): Promise<void> => {
+    try {
+      const response = await addFoodLog(entry);
+      if (response.ok) {
+        const newEntry = await response.json();
+        setFoodLog([...foodLog, newEntry]);
+      } else {
+        console.error('Failed to add food log');
+      }
+    } catch (error) {
+      console.error('Error adding food log:', error);
     }
   };
 
-  const addFoodEntry = async (entry: Omit<FoodEntry, 'id' | 'timestamp'>): Promise<void> => {
-    const newEntry: FoodEntry = {
-      ...entry,
-      id: crypto.randomUUID(),
-      timestamp: new Date().toISOString(),
-    };
-    const updatedLog = [...foodLog, newEntry];
-    setFoodLog(updatedLog);
-    localStorage.setItem(getTodayLogKey(), JSON.stringify(updatedLog));
-  };
-
-  const deleteFoodEntry = (id: string) => {
-    const updatedLog = foodLog.filter(entry => entry.id !== id);
-    setFoodLog(updatedLog);
-    localStorage.setItem(getTodayLogKey(), JSON.stringify(updatedLog));
+  const deleteFoodEntry = async (id: string) => {
+    try {
+      const response = await deleteFoodLog(id);
+      if (response.ok) {
+        setFoodLog(foodLog.filter(entry => entry.id !== id));
+      } else {
+        console.error('Failed to delete food log');
+      }
+    } catch (error) {
+      console.error('Error deleting food log:', error);
+    }
   };
 
   const consumedCalories = foodLog.reduce((sum, entry) => sum + entry.calories, 0);
@@ -107,7 +117,7 @@ const Index = () => {
                 <TableBody>
                   {foodLog.map(entry => (
                     <TableRow key={entry.id}>
-                      <TableCell className="font-medium">{entry.name}</TableCell>
+                      <TableCell className="font-medium">{entry.food_name}</TableCell>
                       <TableCell>{entry.quantity}</TableCell>
                       <TableCell className="text-right">{entry.calories}</TableCell>
                       <TableCell className="text-right">

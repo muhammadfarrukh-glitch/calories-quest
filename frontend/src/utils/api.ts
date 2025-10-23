@@ -1,5 +1,12 @@
 import { getToken } from './auth';
 
+export interface UserGoals {
+  daily_calorie_goal?: number;
+  daily_protein_goal?: number;
+  daily_carb_goal?: number;
+  daily_fat_goal?: number;
+}
+
 const api = async (url: string, options: RequestInit = {}) => {
   const token = getToken();
   const headers = { ...options.headers };
@@ -28,3 +35,50 @@ const api = async (url: string, options: RequestInit = {}) => {
 };
 
 export default api;
+
+export const updateUserGoals = async (goals: UserGoals) => {
+  const url = '/api/users/profile/goals';
+  console.log('Attempting to update goals at:', url);
+  return api(url, {
+    method: 'PUT',
+    body: JSON.stringify(goals),
+  });
+};
+export const getFoodLog = async () => {
+  return api('/api/food/log');
+};
+
+export const addFoodLog = async (foodLog: {
+  food_name: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}) => {
+  return api('/api/food/log', {
+    method: 'POST',
+    body: JSON.stringify(foodLog),
+  });
+};
+
+export const updateFoodLog = async (
+  log_id: string,
+  foodLog: {
+    food_name: string;
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  }
+) => {
+  return api(`/api/food/log/${log_id}`, {
+    method: 'PUT',
+    body: JSON.stringify(foodLog),
+  });
+};
+
+export const deleteFoodLog = async (log_id: string) => {
+  return api(`/api/food/log/${log_id}`, {
+    method: 'DELETE',
+  });
+};

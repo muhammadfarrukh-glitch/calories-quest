@@ -8,7 +8,7 @@ class PyObjectId(ObjectId):
         yield cls.validate
 
     @classmethod
-    def validate(cls, v):
+    def validate(cls, v, _):
         if not ObjectId.is_valid(v):
             raise ValueError("Invalid objectid")
         return ObjectId(v)
@@ -21,6 +21,10 @@ class User(BaseModel):
     id: Optional[PyObjectId] = Field(default=None, alias='_id')
     email: str
     password: str
+    daily_calorie_goal: Optional[float] = None
+    daily_protein_goal: Optional[float] = None
+    daily_carb_goal: Optional[float] = None
+    daily_fat_goal: Optional[float] = None
 
     class Config:
         populate_by_name = True
@@ -28,3 +32,9 @@ class User(BaseModel):
         json_encoders = {
             ObjectId: str
         }
+
+class UserUpdate(BaseModel):
+    daily_calorie_goal: Optional[float] = None
+    daily_protein_goal: Optional[float] = None
+    daily_carb_goal: Optional[float] = None
+    daily_fat_goal: Optional[float] = None

@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from pymongo.mongo_client import MongoClient
 from ..lib.database import get_db
 from pydantic import BaseModel
-from ..lib.models.user import User
+from ..lib.models.user import User, UserUpdate
 from .auth import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_user
 import bcrypt
 from datetime import datetime, timedelta
@@ -22,12 +22,14 @@ class JSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, ObjectId):
             return str(o)
+        if isinstance(o, datetime):
+            return o.isoformat()
         return json.JSONEncoder.default(self, o)
 
 router = APIRouter()
 
 @router.post("/register")
-async def signup(form_data: OAuth2PasswordRequestForm = Depends(), db: MongoClient = Depends(get_db)):
+async def signup(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: MongoClient = Depends(get_db)):
     users_collection = db.get_collection("users")
     
     email = form_data.username
@@ -66,7 +68,7 @@ async def signup(form_data: OAuth2PasswordRequestForm = Depends(), db: MongoClie
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.get("/all")
-async def get_all_users(db: MongoClient = Depends(get_db)):
+async def get_all_users(request: Request, db: MongoClient = Depends(get_db)):
     users_collection = db.get_collection("users")
     users = []
     for user in users_collection.find({}, {"password": 0}):
@@ -74,20 +76,24 @@ async def get_all_users(db: MongoClient = Depends(get_db)):
     return json.loads(JSONEncoder().encode(users))
 
 @router.get("/profile")
-async def get_user_profile(current_user: User = Depends(get_current_user), db: MongoClient = Depends(get_db)):
+async def get_user_profile(request: Request, current_user: User = Depends(get_current_user), db: MongoClient = Depends(get_db)):
     users_collection = db.get_collection("users")
-    user_profile = users_collection.find_one({"email": current_user.email}, {"password": 0})
+    user_profile = await users_collection.find_one({"email": current_user.email}, {"password": 0})
     if not user_profile:
         raise HTTPException(status_code=404, detail="User profile not found")
     return json.loads(JSONEncoder().encode(user_profile))
 
 @router.put("/profile")
-async def update_user_profile(profile_data: UserProfile, current_user: User = Depends(get_current_user), db: MongoClient = Depends(get_db)):
+async def update_user_profile(request: Request, profile_data: UserProfile, current_user: User = Depends(get_current_user), db: MongoClient = Depends(get_db)):
     users_collection = db.get_collection("users")
     
+    user = await users_collection.find_one({"email": current_user.email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User profile not found")
+
     update_data = profile_data.dict()
     
-    result = users_collection.update_one(
+    result = await users_collection.update_one(
         {"email": current_user.email},
         {"$set": update_data}
     )
@@ -95,4 +101,34 @@ async def update_user_profile(profile_data: UserProfile, current_user: User = De
     if result.modified_count == 1:
         return {"message": "Profile updated successfully"}
     
+    if result.matched_count == 1 and result.modified_count == 0:
+        return {"message": "Profile found, but no changes were necessary"}
+
+    raise HTTPException(status_code=404, detail="User profile not found or no changes made")
+
+@router.put("/profile/goals")
+async def update_user_goals(request: Request, goals: UserUpdate, current_user: User = Depends(get_current_user), db: MongoClient = Depends(get_db)):
+    users_collection = db.get_collection("users")
+
+    # Check if the user exists
+    user = await users_collection.find_one({"email": current_user.email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User profile not found")
+
+    update_data = goals.dict(exclude_unset=True)
+    print(f"Updating goals for user {current_user.email} with data: {update_data}")
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No goal data provided")
+
+    result = await users_collection.update_one(
+        {"email": current_user.email},
+        {"$set": update_data}
+    )
+    
+    if result.modified_count == 1:
+        return {"message": "Goals updated successfully"}
+    
+    if result.matched_count == 1 and result.modified_count == 0:
+        return {"message": "Profile found, but no changes were necessary"}
+
     raise HTTPException(status_code=404, detail="User profile not found or no changes made")

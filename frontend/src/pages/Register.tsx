@@ -78,7 +78,7 @@ const Register = () => {
                 </FormItem>
               )} />
               <Button type="submit" className="w-full">Create Account</Button>
-              <Button type="button" variant="outline" className="w-full" onClick={async () => {
+              {/* <Button type="button" variant="outline" className="w-full" onClick={async () => {
                 try {
                   const response = await api('/api/users/all');
                   const data = await response.json();
@@ -86,7 +86,7 @@ const Register = () => {
                 } catch (error) {
                   alert('Error fetching users.');
                 }
-              }}>Check Users</Button>
+              }}>Check Users</Button> */}
             </form>
           </Form>
           <div className="mt-4 text-center text-sm">

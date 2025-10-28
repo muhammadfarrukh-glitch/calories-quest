@@ -34,6 +34,13 @@ const api = async (url: string, options: RequestInit = {}) => {
 };
 
 export default api;
+export const updateUserProfile = async (profile: any) => {
+  const url = '/api/users/profile';
+  return api(url, {
+    method: 'PUT',
+    body: JSON.stringify(profile),
+  });
+};
 
 export const updateUserGoals = async (goals: UserGoals) => {
   const url = '/api/users/profile/goals';

@@ -12,7 +12,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { calculateDailyCalorieTarget } from '@/lib/bmr';
 import { UserProfile } from '@/types';
 import { GoalForm } from '@/components/GoalForm';
-import { updateUserGoals } from '@/utils/api';
+import { updateUserGoals, updateUserProfile } from '@/utils/api';
 
 const formSchema = z.object({
   age: z.coerce.number().min(13, "Must be at least 13 years old"),
@@ -36,13 +36,20 @@ const Onboarding = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     const profile = values as UserProfile;
     setUserProfile(profile);
     const dailyCalorieTarget = calculateDailyCalorieTarget(profile);
     localStorage.setItem('userProfile', JSON.stringify(profile));
     localStorage.setItem('quest', JSON.stringify({ dailyCalorieTarget }));
-    setStep(2);
+
+    try {
+      await updateUserProfile(profile);
+      setStep(2);
+    } catch (error) {
+      console.error("Failed to save profile", error);
+      // Optionally, show an error message to the user
+    }
   }
 
   const handleGoalSuccess = () => {
